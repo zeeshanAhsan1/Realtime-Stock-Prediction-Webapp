@@ -26,8 +26,22 @@ The data is downloaded from YFinance Api which comprises of historical 5 years s
 
 ## WebApp Images
 
+### HomePage
+
 ![HomePage](images/homepage.png)
+
+### 5 Day Prediction
+
 ![5 Day Prediction](/images/5Day_Prediction.png)
+
+### Current Values of stocks
+
 ![Current Values of stocks](/images/realtime_stock_data.png)
+
+### Trend Graphs for next 30 days
+
 ![Trend Graphs for next 30 days](/images/trend_30_days.png)
+
+### Trend Comparison of past 30 days
+
 ![Trend Comparison of past 30 days](/images/trend_last_30_days.png)
