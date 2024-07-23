@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <title>Zee's Stock Trend Lines</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% endcomment %}
+  <link rel="stylesheet" href="{% static 'style.css'%}" />
+
+  <style>
+    /* Style for the graph container */
+    .graph-container {
+        width: 800px; /* Fixed width for the graph */
+        margin: 0 auto; /* Center the graph */
+    }
+
+    /* Style for the graph */
+    body {
+        background-color: #1b1b1b;
+        font-family: Arial, sans-serif;
+        color: #ddd;
+    }
+
+    .line {
+        fill: none;
+        stroke: #4ee44e; /* Line color */
+        stroke-width: 2;
+    }
+
+    .axis text {
+        fill: #ddd; /* Axis labels color */
+        font-size: 12px;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #555; /* Axis lines color */
+        shape-rendering: crispEdges;
+    }
+
+    .grid line {
+        stroke: #333;
+        opacity: 0.7;
+        shape-rendering: crispEdges;
+    }
+
+    .grid path {
+        stroke-width: 0;
+    }
+
+    /* Center the title */
+    h1 {
+        text-align: center;
+    }
+
+    /* Separate the graphs */
+    .graph-container + .graph-container {
+        margin-top: 50px;
+    }
+</style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">
+        <img src="{% static 'logo.png'%}" alt="logo" />
+      </div>
+      <div class="navbar">
+        <div><a href="{% url 'index'%}">Home</a></div>
+        <div><a href="{% url 'prediction'%}">5 Day Prediction</a></div>
+        <div><a href="{% url 'trend_prediction'%}">Trend Graphs</a></div>
+        <div><a href="{% url 'service'%}">Last 30 Days Trend</a></div>
+      </nav>
+    </header>
+    <div class="graph-container">
+      <h1>AMD Predicted Stock Trend for Next 30 Days</h1>
+      <div id="graph1"></div>
+  </div>
+
+  <div class="graph-container">
+      <h1>NVIDIA Predicted Stock Trend for Next 30 Days</h1>
+      <div id="graph2"></div>
+  </div>
+
+  <div class="graph-container">
+      <h1>INTEL Predicted Stock Trend for Next 30 Days</h1>
+      <div id="graph3"></div>
+  </div>
+
+  <script>
+      var myArray1 = {{ res_amd|safe }};
+      var myArray2 = {{ res_nvda|safe }};
+      var myArray3 = {{ res_intl|safe }};
+
+      var margin = { top: 50, right: 50, bottom: 50, left: 70 }, // Increased left margin
+          width = 700 - margin.left - margin.right, // Adjusted width
+          height = 400 - margin.top - margin.bottom;
+
+      var x = d3.scaleLinear()
+          .domain([0, Math.max(myArray1.length, myArray2.length, myArray3.length) - 1])
+          .range([0, width]);
+
+      var y1 = d3.scaleLinear()
+          .domain([d3.min(myArray1), d3.max(myArray1)])
+          .range([height, 0]);
+
+      var y2 = d3.scaleLinear()
+          .domain([d3.min(myArray2), d3.max(myArray2)])
+          .range([height, 0]);
+
+      var y3 = d3.scaleLinear()
+          .domain([d3.min(myArray3), d3.max(myArray3)])
+          .range([height, 0]);
+
+      var line1 = d3.line()
+          .x(function(d, i) { return x(i); })
+          .y(function(d) { return y1(d); })
+          .curve(d3.curveCatmullRom);
+
+      var line2 = d3.line()
+          .x(function(d, i) { return x(i); })
+          .y(function(d) { return y2(d); })
+          .curve(d3.curveCatmullRom);
+
+      var line3 = d3.line()
+          .x(function(d, i) { return x(i); })
+          .y(function(d) { return y3(d); })
+          .curve(d3.curveCatmullRom);
+
+      var svg1 = d3.select("#graph1").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Add grid lines
+      svg1.append("g")
+          .attr("class", "grid")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x)
+              .ticks(myArray1.length)
+              .tickSize(-height)
+              .tickFormat("")
+          );
+
+      svg1.append("g")
+          .attr("class", "grid")
+          .call(d3.axisLeft(y1)
+              .tickSize(-width)
+              .tickFormat("")
+          );
+
+      // Add line path
+      svg1.append("path")
+          .datum(myArray1)
+          .attr("class", "line")
+          .attr("d", line1);
+
+      // Add x-axis
+      svg1.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+
+      // Add y-axis
+      svg1.append("g")
+          .attr("class", "axis")
+          .call(d3.axisLeft(y1))
+          .selectAll("text")
+          .style("fill", "#fff") // Set text color to white
+          .style("font-size", "10px") // Adjust font size
+          .attr("dx", "-0.5em") // Adjust the horizontal position
+          .attr("dy", "-0.5em") // Adjust the vertical position
+          .attr("transform", "translate(-10, 0)"); // Move the labels to the left
+
+      // Add x-axis label
+      svg1.append("text")
+          .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top - 10) + ")")
+          .style("text-anchor", "middle")
+          .style("fill", "#fff") // Set text color to white
+          .text("Days");
+
+      // Add y-axis label
+      svg1.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - margin.left) // Increase the margin to provide more space
+          .attr("x", 0 - (height / 2))
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .style("fill", "#fff") // Set text color to white
+          .text("Stock Value");
+
+      // Second graph
+      var svg2 = d3.select("#graph2").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Add grid lines
+      svg2.append("g")
+          .attr("class", "grid")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x)
+              .ticks(myArray2.length)
+              .tickSize(-height)
+              .tickFormat("")
+          );
+
+      svg2.append("g")
+          .attr("class", "grid")
+          .call(d3.axisLeft(y2)
+              .tickSize(-width)
+              .tickFormat("")
+          );
+
+      // Add line path
+      svg2.append("path")
+          .datum(myArray2)
+          .attr("class", "line")
+          .attr("d", line2);
+
+      // Add x-axis
+      svg2.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+
+      // Add y-axis
+      svg2.append("g")
+          .attr("class", "axis")
+          .call(d3.axisLeft(y2))
+          .selectAll("text")
+          .style("fill", "#fff") // Set text color to white
+          .style("font-size", "10px") // Adjust font size
+          .attr("dx", "-0.5em") // Adjust the horizontal position
+          .attr("dy", "-0.5em") // Adjust the vertical position
+          .attr("transform", "translate(-10, 0)"); // Move the labels to the left
+
+      // Add x-axis label
+      svg2.append("text")
+          .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top - 10) + ")")
+          .style("text-anchor", "middle")
+          .style("fill", "#fff") // Set text color to white
+          .text("Days");
+
+      // Add y-axis label
+      svg2.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - margin.left) // Increase the margin to provide more space
+          .attr("x", 0 - (height / 2))
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .style("fill", "#fff") // Set text color to white
+          .text("Stock Value");
+
+      // Third graph
+      var svg3 = d3.select("#graph3").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Add grid lines
+      svg3.append("g")
+          .attr("class", "grid")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x)
+              .ticks(myArray3.length)
+              .tickSize(-height)
+              .tickFormat("")
+          );
+
+      svg3.append("g")
+          .attr("class", "grid")
+          .call(d3.axisLeft(y3)
+              .tickSize(-width)
+              .tickFormat("")
+          );
+
+      // Add line path
+      svg3.append("path")
+          .datum(myArray3)
+          .attr("class", "line")
+          .attr("d", line3);
+
+      // Add x-axis
+      svg3.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+
+      // Add y-axis
+      svg3.append("g")
+          .attr("class", "axis")
+          .call(d3.axisLeft(y3))
+          .selectAll("text")
+          .style("fill", "#fff") // Set text color to white
+          .style("font-size", "10px") // Adjust font size
+          .attr("dx", "-0.5em") // Adjust the horizontal position
+          .attr("dy", "-0.5em") // Adjust the vertical position
+          .attr("transform", "translate(-10, 0)"); // Move the labels to the left
+
+      // Add x-axis label
+      svg3.append("text")
+          .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top - 10) + ")")
+          .style("text-anchor", "middle")
+          .style("fill", "#fff") // Set text color to white
+          .text("Days");
+
+      // Add y-axis label
+      svg3.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - margin.left) // Increase the margin to provide more space
+          .attr("x", 0 - (height / 2))
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .style("fill", "#fff") // Set text color to white
+          .text("Stock Value");
+  </script>
+    
+  </body>
+</html>
+{% comment %} .data([symbolData]) {% endcomment %}

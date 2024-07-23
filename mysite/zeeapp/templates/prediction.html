@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Zee's Stock Prediction Website</title>
+
+    <link rel="stylesheet" href="{% static 'style.css'%}" />
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+    <style>
+      {% comment %} body {
+          background-color: #333;
+          color: white;
+      } {% endcomment %}
+      table {
+          border-collapse: collapse;
+          width: 50%;
+          margin: 20px auto;
+      }
+      th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+      }
+      th {
+          background-color: #555;
+      }
+  </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="logo">
+          <img src="{% static 'logo.png'%}" alt="logo" />
+        </div>
+        <div class="navbar">
+          <div><a href="{% url 'index'%}">Home</a></div>
+          <div><a href="{% url 'prediction'%}">5 Day Prediction</a></div>
+          <div><a href="{% url 'trend_prediction'%}">Trend Graphs</a></div>
+          <div><a href="{% url 'service'%}">Last 30 Days Trend</a></div>
+        </div>
+      </nav>
+    </header>
+   <p>{{val}}</p>
+   <div style="text-align: center;">
+   <h2>
+    <span
+      style="
+        background-image: linear-gradient(to right, #76b900, #1aab44);
+        color: transparent;
+        background-clip: text;
+      "
+      >NVIDIA</span
+    >
+  </h2>
+</div>
+   <table>
+    <thead>
+      <tr>
+        <th>Day from today</th>
+        <th>Predicted Stock Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Assuming "array" contains the values -->
+      <!-- Replace array values with your actual array values -->
+      <!-- Assuming array.length >= 5 -->
+      <tr>
+        <td>Day 1</td>
+        <td>{{val1}}</td>
+      </tr>
+      <tr>
+        <td>Day 2</td>
+        <td>{{val2}}</td>
+      </tr>
+      <tr>
+        <td>Day 3</td>
+        <td>{{val3}}</td>
+      </tr>
+      <tr>
+        <td>Day 4</td>
+        <td>{{val4}}</td>
+      </tr>
+      <tr>
+        <td>Day 5</td>
+        <td>{{val5}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br>
+  <br>
+  <br>
+
+
+
+  <div style="text-align: center;">
+    <h2>
+      <span
+        style="
+          background-image: linear-gradient(to right, #ed1c24, #ed2939);
+          color: transparent;
+          background-clip: text;
+        "
+        >AMD</span
+      >
+    </h2>
+ </div>
+   <table>
+    <thead>
+      <tr>
+        <th>Day from today</th>
+        <th>Predicted Stock Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Assuming "array" contains the values -->
+      <!-- Replace array values with your actual array values -->
+      <!-- Assuming array.length >= 5 -->
+      <tr>
+        <td>Day 1</td>
+        <td>{{val6}}</td>
+      </tr>
+      <tr>
+        <td>Day 2</td>
+        <td>{{val7}}</td>
+      </tr>
+      <tr>
+        <td>Day 3</td>
+        <td>{{val8}}</td>
+      </tr>
+      <tr>
+        <td>Day 4</td>
+        <td>{{val9}}</td>
+      </tr>
+      <tr>
+        <td>Day 5</td>
+        <td>{{val10}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br>
+  <br>
+  <br>
+
+
+
+  <div style="text-align: center;">
+    <h2>
+      <span
+        style="
+          background-image: linear-gradient(to right, #0071c5, #00adef);
+          color: transparent;
+          background-clip: text;
+        "
+        >INTEL</span
+      >
+    </h2>
+ </div>
+   <table>
+    <thead>
+      <tr>
+        <th>Day from today</th>
+        <th>Predicted Stock Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Assuming "array" contains the values -->
+      <!-- Replace array values with your actual array values -->
+      <!-- Assuming array.length >= 5 -->
+      <tr>
+        <td>Day 1</td>
+        <td>{{val11}}</td>
+      </tr>
+      <tr>
+        <td>Day 2</td>
+        <td>{{val12}}</td>
+      </tr>
+      <tr>
+        <td>Day 3</td>
+        <td>{{val13}}</td>
+      </tr>
+      <tr>
+        <td>Day 4</td>
+        <td>{{val14}}</td>
+      </tr>
+      <tr>
+        <td>Day 5</td>
+        <td>{{val15}}</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+  </body>
+</html>

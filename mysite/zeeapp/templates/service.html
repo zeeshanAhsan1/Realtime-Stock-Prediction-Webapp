@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <title>Zee's Stock Prediction Website</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <link rel="stylesheet" href="{% static 'style.css'%}" />
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">
+        <img src="{% static 'logo.png'%}" alt="logo" />
+      </div>
+      <div class="navbar">
+        <div><a href="{% url 'index'%}">Home</a></div>
+        <div><a href="{% url 'prediction'%}">5 Day Prediction</a></div>
+        <div><a href="{% url 'trend_prediction'%}">Trend Graphs</a></div>
+        <div><a href="{% url 'service'%}">Last 30 Days Trend</a></div>
+      </nav>
+    </header>
+    <div id="stock-chart"></div>
+    <script>
+      // Parse the data passed from the Django view
+      const jsonData = {{ data|safe }};
+    
+      // Extract symbols
+      const symbols = Array.from(new Set(jsonData.map(item => item.fields.symbol)));
+    
+      // Set up SVG container dimensions
+      const width = 1200;
+      const height = 600;
+      const margin = { top: 20, right: 20, bottom: 50, left: 50 };
+    
+      // Create an SVG container within the specified div
+      const svg = d3.select("#stock-chart")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+      // Create scales for x and y axes
+      const xScale = d3.scaleBand().range([0, width]).padding(0.1);
+      const yScale = d3.scaleLinear().range([height, 0]);
+    
+      // Set the domain for x and y scales based on the data
+      xScale.domain(jsonData.map(d => new Date(d.fields.date)));
+      yScale.domain([0, d3.max(jsonData, d => d.fields.close_price)]).nice();
+    
+      // Add x and y axes
+      const xAxis = d3.axisBottom(xScale)
+        .tickFormat(d3.timeFormat("%Y-%m-%d")); // Format the tick labels as desired
+    
+      const yAxis = d3.axisLeft(yScale).ticks(10);
+    
+      svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
+    
+      svg.append("g")
+        .call(yAxis);
+
+      // Add x-axis label
+      svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height + margin.bottom - 10)
+      .style("fill", "#FFD700")
+      .attr("text-anchor", "middle")
+      .text("Date");
+
+      // Add y-axis label
+      svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left)
+        .attr("x", -height / 2)
+        .attr("dy", "1em")
+        .style("fill", "#FFD700")
+        .attr("text-anchor", "middle")
+        .text("Closing Price");
+
+      // Add graph name
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", margin.top - 10)
+        .style("fill", "#FFD700")
+        .attr("text-anchor", "middle")
+        .style("font-size", "20px")
+        .text("Stock Closing Prices Trend Over Last 30 days");
+    
+      // Function to get a random color
+      function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+
+      // Specific colors for each line
+      const lineColors = ["#DA70D6", "#FFD700", "#32CD32", "#4682B4", "#FF6347"];
+    
+      // Iterate over symbols and add lines and legends
+      symbols.forEach((symbol, index) => {
+        // Filter data for the current symbol
+        const symbolData = jsonData.filter(item => item.fields.symbol === symbol);
+    
+        if (symbolData.length > 0) {
+          // Create a line generator
+          const lineGenerator = d3.line()
+            .x(d => xScale(new Date(d.fields.date)))
+            .y(d => yScale(d.fields.close_price))
+            .curve(d3.curveCardinal);
+
+          var my_color = getRandomColor()
+          const lineColor = lineColors[index % lineColors.length];
+          // Add a line
+          svg.append("path")
+            .attr("d", lineGenerator(symbolData))
+            .attr("fill", "none")
+            .attr("stroke", lineColor)
+            .attr("stroke-width", 2);
+    
+          // Add legend
+          svg.append("text")
+            .attr("x", margin.left)
+            .attr("y", margin.top + index * 20)
+            .attr("fill", lineColor)
+            .style("font-size", "14px")
+            .text(symbol)
+            .attr("text-anchor", "start")
+            .attr("alignment-baseline", "middle");
+        }
+      });
+    </script>
+    
+    
+    
+  </body>
+</html>
+{% comment %} .data([symbolData]) {% endcomment %}
